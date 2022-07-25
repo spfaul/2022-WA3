@@ -8,7 +8,12 @@
 > List all the features in the fully functional app - you may choose to work on a subset of this listing to produce a MVP (minimum viable product) given constraint of time
 
 # External Scanning
-
-# Success Factors
+> Are there similar apps / codebase that you found online that is similar to your project?  Provide link(s) to these projects and outline how will your project be different?
 
 # Timeline
+> - Week 5
+> - Week 6
+> - Week 7
+> - Week 8
+> - Week 9
+> - Week 10
