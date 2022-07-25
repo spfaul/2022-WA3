@@ -1,2 +1,2 @@
 # 2022-Y3CEP
-[Project Proposal](https://github.com/ricepteacher/2022-Y3CEP/blob/829e6b3f946cf5c40b55c6b16f75b2967ca32641/proposal.md)
+[Project Proposal](https://github.com/ricepteacher/2022-Y3CEP/blob/48355467646b47159ea3a754cdf4818d2a93b43f/proposal.md)
