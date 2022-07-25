@@ -14,6 +14,9 @@
 > Yearly, CCA senior will do stock-take and will need to generate a report on the existing stock.
 > Start of school break, members will loan equipment and will need to return when school break ends.
 
+# Skills that my project requires me to pick up
+> List out the skills that you are not familiar with that is necessary due to the project scope.
+
 # [Development Log](/devlog.md)
 > You will be updating this section regularly
 > - Week 5
