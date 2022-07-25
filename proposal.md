@@ -10,6 +10,10 @@
 # External Scanning
 > Are there similar apps / codebase that you found online that is similar to your project?  Provide link(s) to these projects and outline how will your project be different?
 
+# Listing of Key Use Cases
+> Yearly, CCA senior will do stock-take and will need to generate a report on the existing stock.
+> Start of school break, members will loan equipment and will need to return when school break ends.
+
 # Timeline
 > - Week 5
 > - Week 6
