@@ -14,7 +14,8 @@
 > Yearly, CCA senior will do stock-take and will need to generate a report on the existing stock.
 > Start of school break, members will loan equipment and will need to return when school break ends.
 
-# Timeline
+# [Development Log](/devlog.md)
+> You will be updating this section regularly
 > - Week 5
 > - Week 6
 > - Week 7
