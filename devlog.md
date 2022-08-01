@@ -12,8 +12,20 @@
 [Example of Good/Bad Changelist descriptions](https://google.github.io/eng-practices/review/developer/cl-descriptions.html)
 
 ## Week 5 (26 Jul - 1 Aug)
-
+- Goals
+    - [x] Get a basic hello-world TUI working
+    - [x] Create basic logger
+    - [x] Create basic keyboard dispatcher
+    - [ ] Create pty process class
+- Problems
+    - DOS Compatibility (only targeting UNIX now, lol)
+- Next week
+    - [ ] Create pty process class
+    - [ ] Forward output of pty process to TerminalWindow TUI 
+    
 ## Week 6 (2 Aug - 8 Aug)
+- Problems
+    - OBS
 
 ## Week 7 (9 Aug - 15 Aug)
 
