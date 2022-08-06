@@ -12,7 +12,8 @@ class KeyboardHandler:
 
     def getch(self):
         key = self.win.getch()
-        self.dispatch(key)
+        if key != -1: # No key pressed
+            self.dispatch(key)
 
     def dispatch(self, key):
         if "*" in self.keymap:

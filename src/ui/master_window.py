@@ -12,7 +12,7 @@ class MasterWindow:
         self.stdscr = stdscr
         self.running = False
         self.size_y, self.size_x = stdscr.getmaxyx()
-        self.term = TerminalWindow(stdscr.derwin(self.size_y-1, self.size_x, 1, 0))
+        self.term_win = TerminalWindow(logs, stdscr.derwin(self.size_y-1, self.size_x, 1, 0))
         self.kbh = KeyboardHandler(stdscr)
 
     def init_kb(self):
@@ -20,16 +20,17 @@ class MasterWindow:
 
     def asd(self, key):
         self.logs.info(f"key is {key}/{chr(key)}")
-        self.term.addstr(chr(key))
-        self.term.win().refresh()
+        self.term_win.term.send(chr(key).encode("utf8"))
+        # self.term_win.term.send("a\n".encode("utf8"))
+        self.term_win.update()
         self.stdscr.refresh()
         
     def run(self):
         self.running = True
         self.init_kb()
         self.stdscr.erase()
-        self.term.box()
+        self.term_win.box()
         while self.running:
-            self.kbh.getch()
-            
+            self.term_win.update()
+            self.kbh.getch()            
 
