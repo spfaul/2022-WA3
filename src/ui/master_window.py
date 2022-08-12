@@ -16,7 +16,7 @@ class MasterWindow:
         self.kbh = KeyboardHandler(stdscr)
 
     def init_kb(self):
-        self.kbh.listen("*", self.asd)
+        self.kbh.on("*", self.asd)
 
     def asd(self, key):
         self.logs.info(f"key is {key}/{chr(key)}")

@@ -15,6 +15,7 @@ class TerminalProcess:
                                     stdin=slave,
                                     stdout=slave,
                                     stderr=slave,
+                                    close_fds=True,
                                     preexec_fn=self.preinit_fn)
 
         # Create psuedo-iobuffers by opening fd copies of master
@@ -88,6 +89,6 @@ class TerminalProcess:
         self.stdin.write(line)
 
     def resize(self, lines, cols):
-        fcntl.ioctl(self.stdout, termios.TIOCSWINSZ, struct.pack("HHHH", lines, cols, 0, 0))
+        fcntl.ioctl(self.stdout, termios.TIOCSWINSZ, struct.pack("hhhh", lines, cols, 0, 0))
         self.proc.send_signal(signal.SIGWINCH)
         

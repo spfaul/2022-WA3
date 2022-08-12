@@ -3,7 +3,7 @@ class KeyboardHandler:
         self.win = win
         self.keymap = {}
         
-    def listen(self, key_list, func):
+    def on(self, key_list, func):
         for key in key_list:
             if key not in self.keymap:
                 self.keymap[key] = [func]
