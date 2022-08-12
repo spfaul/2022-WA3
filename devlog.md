@@ -24,11 +24,22 @@
     - [ ] Forward output of pty process to TerminalWindow TUI 
     
 ## Week 6 (2 Aug - 8 Aug)
+- Goals
+    - [x] Create pty process class    
+    - [x] Forward output of pty process to TerminalWindow TUI (sloppy wip)
 - Problems
-    - OBS
-
+    - Exams
+- Next week
+    - [ ] ANSI escape code parsing
+    - [ ] Clean output of termproc before forwarding to UI
 ## Week 7 (9 Aug - 15 Aug)
-
+- Goals
+    - [x] ANSI escape code parsing (no implementation on encounter, just dispatch and identification)    
+    - [x] Clean output of termproc before forwarding to UI
+- Problems
+    - NA
+- Next week
+    - [ ] ANSI escape code encounter implementation 
 ## Week 8 (16 Aug - 22 Aug)
 
 ## Week 9 (23 Aug - 29 Aug)
