@@ -19,8 +19,8 @@ class TerminalProcess:
                                     preexec_fn=self.preinit_fn)
 
         # Create psuedo-iobuffers by opening fd copies of master
-        self.stderr = os.fdopen(os.dup(master), 'r+b', 0)
         self.stdin = os.fdopen(os.dup(master), 'r+b', 0)
+        self.stderr = os.fdopen(os.dup(master), 'r+b', 0)
         # Make stdout non-blocking
         stdoutfd = os.dup(master) 
         fl = fcntl.fcntl(stdoutfd, fcntl.F_GETFL)
@@ -76,9 +76,9 @@ class TerminalProcess:
         else:
             os.close(fd)
 
-    def read(self, amnt_bytes):
+    def read(self, fd, amnt_bytes):
         try:
-            chunk = self.stdout.read(amnt_bytes)
+            chunk = fd.read(amnt_bytes)
             if chunk is None:
                 return None
             return chunk.decode('utf8', 'replace')
