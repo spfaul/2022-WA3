@@ -1,3 +1,7 @@
+import sys
+import os
+import select
+
 class KeyboardHandler:
     def __init__(self, win):
         self.win = win

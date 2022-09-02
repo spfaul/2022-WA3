@@ -17,7 +17,7 @@ class TerminalWindow(Boxed):
         self.logs = logs
         max_y, max_x = self._win.getmaxyx()
         self.term = TerminalProcess()
-        self.char_disp = CharDisplay((max_x, max_y))
+        self.char_disp = CharDisplay(logs, (max_x, max_y))
         self.esc_handler = EscCodeHandler(self.logs, self.char_disp)
         self.setup_esc()
         self.__line = ""
@@ -27,6 +27,21 @@ class TerminalWindow(Boxed):
         self.esc_handler.on("B", self.move_curs_down)
         self.esc_handler.on("C", self.move_curs_right)
         self.esc_handler.on("D", self.move_curs_left)
+        self.esc_handler.on("H", lambda disp, lines: disp.curs.set_pos(0, 0))
+        self.esc_handler.on("J", self.erase_disp)
+        self.esc_handler.on("K", self.erase_inline)
+
+    def erase_disp(self, disp, code):
+        if code in ("", "0"):
+            disp.erase_all_to_curs()
+        elif code == "1":
+            disp.erase_all_from_curs()
+        elif code == "2":
+            disp.erase_all()
+
+    def erase_inline(self, disp, code):
+        if code in ("", "0"):
+            disp.erase_inline_from_curs()
 
     def move_curs_up(self, disp, lines):
         disp.curs.y -= int(lines)
@@ -76,19 +91,22 @@ class TerminalWindow(Boxed):
                 self.char_disp.write(self.__line)
                 self.char_disp.curs.x = 0
                 self.__line = ""
+            elif c == "\b":
+                self.char_disp.write(self.__line)
+                self.char_disp.curs.x = max(self.char_disp.curs.x-1, 0)
+                self.__line = ""
             else:
                 self.__line += c
             chunk = chunk[1:]
 
-        if len(self.__line):
-            self.char_disp.write(self.__line)
+        self.char_disp.write(self.__line)
         self.__line = ""
 
     def update(self):
         for buff in [self.term.stdout, self.term.stderr]:
             chunk = self.term.read(buff, 4096)
             if chunk:
-                self.logs.info(repr(chunk))
+                # self.logs.info(repr(chunk))
                 self._parse(chunk)
             self.draw()
 
