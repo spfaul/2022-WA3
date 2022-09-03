@@ -27,7 +27,7 @@ class TerminalWindow(Boxed):
         self.esc_handler.on("B", self.move_curs_down)
         self.esc_handler.on("C", self.move_curs_right)
         self.esc_handler.on("D", self.move_curs_left)
-        self.esc_handler.on("H", lambda disp, lines: disp.curs.set_pos(0, 0))
+        self.esc_handler.on("H", lambda disp, lines=0, cols=0: disp.curs.set_pos(int(cols), int(lines)))
         self.esc_handler.on("J", self.erase_disp)
         self.esc_handler.on("K", self.erase_inline)
 
@@ -44,24 +44,16 @@ class TerminalWindow(Boxed):
             disp.erase_inline_from_curs()
 
     def move_curs_up(self, disp, lines):
-        disp.curs.y -= int(lines)
-        if disp.curs.y < 0:
-            disp.curs.y = 0
+        disp.curs.y = max(0, disp.curs.y-int(lines))
 
     def move_curs_down(self, disp, lines):
-        disp.curs.y += int(lines)
-        if disp.curs.y > disp.size[1]-1:
-            disp.curs.y = disp.size[1] - 1
+        disp.curs.y = min(disp.size[1]-1, disp.curs.y+int(lines))
 
     def move_curs_right(self, disp, cols):
-        disp.curs.x += int(cols)
-        if disp.curs.x > disp.size[0]-1:
-            disp.curs.x = disp.size[0] - 1
+        disp.curs.x = min(disp.size[0]-1, disp.curs.x+int(cols))
 
     def move_curs_left(self, disp, cols):
-        disp.curs.x -= int(cols)
-        if disp.curs.x < 0:
-            disp.curs.x = 0
+        disp.curs.x = max(0, disp.curs.x-int(cols))
 
     def draw(self):
         self._win.erase()
@@ -106,7 +98,7 @@ class TerminalWindow(Boxed):
         for buff in [self.term.stdout, self.term.stderr]:
             chunk = self.term.read(buff, 4096)
             if chunk:
-                # self.logs.info(repr(chunk))
+                self.logs.info(repr(chunk))
                 self._parse(chunk)
             self.draw()
 

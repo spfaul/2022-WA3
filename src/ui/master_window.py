@@ -40,4 +40,3 @@ class MasterWindow:
         while self.running:
             self.term_win.update()
             self.kbh.getch()            
-            curses.napms(5)
