@@ -27,9 +27,16 @@ class TerminalWindow(Boxed):
         self.esc_handler.on("B", self.move_curs_down)
         self.esc_handler.on("C", self.move_curs_right)
         self.esc_handler.on("D", self.move_curs_left)
-        self.esc_handler.on("H", lambda disp, lines=0, cols=0: disp.curs.set_pos(int(cols), int(lines)))
+        self.esc_handler.on("H", self.move_curs_home)
         self.esc_handler.on("J", self.erase_disp)
         self.esc_handler.on("K", self.erase_inline)
+
+    def move_curs_home(self, disp, lines='', cols=''):
+        if not lines:
+            lines = 0
+        if not cols:
+            cols = 0
+        disp.curs.set_pos(int(cols), int(lines))
 
     def erase_disp(self, disp, code):
         if code in ("", "0"):
