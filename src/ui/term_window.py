@@ -3,6 +3,7 @@ Terminal Emulator UI - each TerminalWindow object spins up a single process
 """
 
 import re
+import curses
 import select
 from dataclasses import dataclass
 from core.esc_code import EscCodeHandler
@@ -21,6 +22,9 @@ class TerminalWindow(Boxed):
         self.esc_handler = EscCodeHandler(self.logs, self.char_disp)
         self.setup_esc()
         self.__line = ""
+        
+    def refresh_curs(self):
+        self._win.move(self.char_disp.curs.y, self.char_disp.curs.x)
 
     def setup_esc(self):
         self.esc_handler.on("A", self.move_curs_up)
@@ -30,16 +34,23 @@ class TerminalWindow(Boxed):
         self.esc_handler.on("H", self.move_curs_home)
         self.esc_handler.on("J", self.erase_disp)
         self.esc_handler.on("K", self.erase_inline)
+        self.esc_handler.on("P", self.del_char)
 
-    def move_curs_home(self, disp, lines='', cols=''):
-        if not lines:
-            lines = 0
-        if not cols:
-            cols = 0
+    def move_curs_home(self, disp, lines=0, cols=0):
         disp.curs.set_pos(int(cols), int(lines))
 
+    def del_char(self, disp, code):
+        line = disp.buffer[disp.curs.y]
+        cols = int(code)
+        if not cols:
+            cols = 1
+        if cols + disp.curs.x > disp.size[0] - 1:
+            return
+        disp.buffer[disp.curs.y] = line[:disp.curs.x] + line[disp.curs.x+cols:] + [CharCell() for _ in range(cols)]
+        self.draw()
+
     def erase_disp(self, disp, code):
-        if code in ("", "0"):
+        if code == "0":
             disp.erase_all_to_curs()
         elif code == "1":
             disp.erase_all_from_curs()
@@ -47,20 +58,29 @@ class TerminalWindow(Boxed):
             disp.erase_all()
 
     def erase_inline(self, disp, code):
-        if code in ("", "0"):
+        if code == "0":
             disp.erase_inline_from_curs()
 
     def move_curs_up(self, disp, lines):
+        if lines == "0":
+            lines = 1
         disp.curs.y = max(0, disp.curs.y-int(lines))
-
+    
     def move_curs_down(self, disp, lines):
+        if lines == "0":
+            lines = 1
         disp.curs.y = min(disp.size[1]-1, disp.curs.y+int(lines))
 
     def move_curs_right(self, disp, cols):
+        if cols == "0":
+            cols = 1
         disp.curs.x = min(disp.size[0]-1, disp.curs.x+int(cols))
 
     def move_curs_left(self, disp, cols):
+        if cols == "0":            
+            cols = 1
         disp.curs.x = max(0, disp.curs.x-int(cols))
+        self.refresh_curs()
 
     def draw(self):
         self._win.erase()
@@ -68,6 +88,7 @@ class TerminalWindow(Boxed):
             for x, cell in enumerate(row):
                 if cell.data:
                     self._win.addch(y, x, cell.data)
+        self.refresh_curs()
         self._win.refresh()
 
     __line = ""
@@ -92,7 +113,7 @@ class TerminalWindow(Boxed):
                 self.__line = ""
             elif c == "\b":
                 self.char_disp.write(self.__line)
-                self.char_disp.curs.x = max(self.char_disp.curs.x-1, 0)
+                self.move_curs_left(self.char_disp, 1)
                 self.__line = ""
             else:
                 self.__line += c
@@ -108,5 +129,4 @@ class TerminalWindow(Boxed):
                 self.logs.info(repr(chunk))
                 self._parse(chunk)
             self.draw()
-
     

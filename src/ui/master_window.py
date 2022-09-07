@@ -13,21 +13,25 @@ class MasterWindow:
         self.stdscr = stdscr
         self.running = False
         self.size_y, self.size_x = stdscr.getmaxyx()
-        self.term_win = TerminalWindow(logs, stdscr.derwin(self.size_y-1, self.size_x, 1, 0))
+        self.term_win = TerminalWindow(logs, stdscr.derwin(self.size_y, self.size_x, 0, 0))
         self.kbh = KeyboardHandler(stdscr)
 
     def init_kb(self):
         self.kbh.on("*", self.on_key)
-        # self.kbh.on([curses.KEY_LEFT], lambda key: self.term_win.term.send(b"\x1b[1D"))
+        self.kbh.on([curses.KEY_BACKSPACE], lambda key: self.term_win.term.send(b"\b"))
+        self.kbh.on([curses.KEY_LEFT], lambda key: self.term_win.term.send(b"\x1b[D"))
+        self.kbh.on([curses.KEY_RIGHT], lambda key: self.term_win.term.send(b"\x1b[C"))
+        self.kbh.on([curses.KEY_UP], lambda key: self.term_win.term.send(b"\x1b[A"))
+        self.kbh.on([curses.KEY_DOWN], lambda key: self.term_win.term.send(b"\x1b[B"))
+        self.kbh.on([curses.KEY_RESIZE], lambda key: self.resize())
 
+    def resize(self):
+        pass
+        
     def on_key(self, key):
         self.logs.info(f"key is {key}/{chr(key)}")
-        if key == curses.KEY_BACKSPACE:
-            self.term_win.term.send(b"\b")
-        # elif key == curses.KEY_LEFT:
-            # self.logs.info(self.term_win.char_disp.curs.x)
-            # self.term_win.move_curs_left(self.term_win.char_disp, 1)
-        else:
+        SPECIAL_KEYS = [curses.KEY_BACKSPACE, curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_UP, curses.KEY_DOWN, curses.KEY_DC]
+        if key not in SPECIAL_KEYS and curses.ascii.isascii(key):
             self.term_win.term.send(chr(key).encode("utf8"))
         self.term_win.update()
         self.stdscr.refresh()

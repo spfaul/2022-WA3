@@ -5,6 +5,22 @@ class Cursor:
         self.x = x
         self.y = y
 
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, val):
+        self._x = val
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, val):
+        self._y = val
+
     def set_pos(self, x, y):
         self.x, self.y = x, y
 

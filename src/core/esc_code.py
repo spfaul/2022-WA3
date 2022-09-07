@@ -25,6 +25,7 @@ class EscCodeHandler:
         arglist = [args]
         if ";" in args:
             arglist = args.split(";")
+        arglist = [arg  if arg else "0" for arg in arglist]
         self.logs.info(f"{char} - {arglist}")
         self.dispatch(char, arglist)
         return text[2+len(args)+1:] # \x1b[ = length 2, code_char = length 1
