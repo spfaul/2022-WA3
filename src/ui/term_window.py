@@ -35,10 +35,21 @@ class TerminalWindow(Boxed):
         self.esc_handler.on("J", self.erase_disp)
         self.esc_handler.on("K", self.erase_inline)
         self.esc_handler.on("P", self.del_char)
+        self.esc_handler.on("@", self.backspace_char)
 
     def move_curs_home(self, disp, lines=0, cols=0):
         disp.curs.set_pos(int(cols), int(lines))
 
+    def backspace_char(self, disp, code):
+        cols = int(code)
+        if cols == 0:
+            cols = 1
+        self.logs.info(disp.buffer[disp.curs.y])
+        for cell in disp.buffer[disp.curs.y][disp.curs.x:disp.curs.x+cols]:
+            cell.data = ""
+        self.logs.info(disp.buffer[disp.curs.y])
+        self.draw()
+        
     def del_char(self, disp, code):
         line = disp.buffer[disp.curs.y]
         cols = int(code)
@@ -46,7 +57,9 @@ class TerminalWindow(Boxed):
             cols = 1
         if cols + disp.curs.x > disp.size[0] - 1:
             return
+        self.logs.info(disp.buffer[disp.curs.y])
         disp.buffer[disp.curs.y] = line[:disp.curs.x] + line[disp.curs.x+cols:] + [CharCell() for _ in range(cols)]
+        self.logs.info(disp.buffer[disp.curs.y])
         self.draw()
 
     def erase_disp(self, disp, code):
@@ -100,6 +113,8 @@ class TerminalWindow(Boxed):
                 self.char_disp.newline()
                 self.__line = ""
             elif c == "\x1b":
+                self.char_disp.write(self.__line)            
+                self.__line = ""
                 new_chunk = self.esc_handler.handle_head(chunk)
                 if new_chunk is None:
                     self.char_disp.write(self.__line)

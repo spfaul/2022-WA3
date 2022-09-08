@@ -1,7 +1,11 @@
 import re
 
 class EscCodeHandler:
-    esc_regex = re.compile(r'^\x1b\[?([?\d;]*)(\w)')
+    esc_regexs = [
+        (re.compile(r'^\x1b\[(\d+)?@'), "@"),
+        (re.compile(r'^\x1b\[?([?\d;]*)(\w)'), None)
+    ]
+
     def __init__(self, logs, display):
         self.logs = logs
         self.display = display
@@ -31,7 +35,13 @@ class EscCodeHandler:
         return text[2+len(args)+1:] # \x1b[ = length 2, code_char = length 1
 
     def _parse(self, text):
-        matches = self.esc_regex.match(text)
-        if not matches:
-            return None, None
-        return matches.groups()
+        for pattern, char in self.esc_regexs:   
+            matches = pattern.match(text)
+            if matches:
+                # self.logs.info(matches)
+                if char:
+                    return matches.group(1), char
+                return matches.groups()
+        return None, None
+
+            
