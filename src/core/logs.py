@@ -1,13 +1,11 @@
-"""
-Basic log implementation.
-
-Logs are important as this project utilizes the terminal screen, so any errors from stderr or debug information from stdout can be stored here.
-"""
-
 from datetime import datetime
 import sys
 
 class Logger:
+    """
+    Basic log implementation.
+    Logs are required as UI utilizes the terminal screen, so any errors or debug information must be programatically stored.
+    """
     def __init__(self, filepath):
         self.filepath = filepath
 
