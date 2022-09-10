@@ -3,6 +3,7 @@ import re
 class EscCodeHandler:
     esc_regexs = [
         (re.compile(r'^\x1b\[(\d+)?@'), "@"),
+        (re.compile(r'^\x1b\(B'), "IGNORE"),
         (re.compile(r'^\x1b\[?([?\d;]*)(\w)'), None)
     ]
 
@@ -24,6 +25,8 @@ class EscCodeHandler:
         
     def handle_head(self, text):
         args, char = self._parse(text)
+        if char == "IGNORE":
+            return text[len(args):]
         if not args and not char:
             return None
         arglist = [args]
@@ -39,7 +42,9 @@ class EscCodeHandler:
             matches = pattern.match(text)
             if matches:
                 # self.logs.info(matches)
-                if char:
+                if char == "IGNORE":
+                    return matches.group(0), char
+                elif char:
                     return matches.group(1), char
                 return matches.groups()
         return None, None

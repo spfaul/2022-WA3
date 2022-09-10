@@ -5,22 +5,6 @@ class Cursor:
         self.x = x
         self.y = y
 
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, val):
-        self._x = val
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, val):
-        self._y = val
-
     def set_pos(self, x, y):
         self.x, self.y = x, y
 
@@ -43,8 +27,19 @@ class CharDisplay:
         self.curs = Cursor(0, 0)
         self.buffer = [[CharCell() for _ in range(self.size[0])] for _ in range(self.size[1])]
 
+    def resize(self, new_x, new_y):
+        if self.size[1] > new_y:
+            self.buffer = self.buffer[:self.curs.y+1][-new_y:]
+        if self.size[0] > new_x:
+            for y in range(len(self.buffer)):
+                self.buffer[y] = self.buffer[y][:new_x]
+        if self.curs.x >= new_x:
+            self.curs.x = new_x-1
+        if self.curs.y >= new_y:
+            self.curs.y = new_y-1
+        self.size = (new_x, new_y)
+
     def write(self, text):
-        # self.logs.info(f"wrote {repr(text)}")
         for c in text:
             self.buffer[self.curs.y][self.curs.x].data = c
             self.advance_cursor()

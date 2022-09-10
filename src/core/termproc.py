@@ -88,7 +88,7 @@ class TerminalProcess:
     def send(self, line):
         self.stdin.write(line)
 
-    def resize(self, lines, cols):
+    def resize(self, cols, lines):
         fcntl.ioctl(self.stdout, termios.TIOCSWINSZ, struct.pack("hhhh", lines, cols, 0, 0))
         self.proc.send_signal(signal.SIGWINCH)
         

@@ -13,17 +13,39 @@ from .boxed import Boxed
 
 
 class TerminalWindow(Boxed):
-    def __init__(self, logs, win):
+    def __init__(self, logs, win, on_destroy, active=False):
         super().__init__(win)
         self.logs = logs
+        self.on_destroy = on_destroy
         max_y, max_x = self._win.getmaxyx()
         self.term = TerminalProcess()
+        self.term.resize(max_x-2, max_y-2)
         self.char_disp = CharDisplay(logs, (max_x, max_y))
         self.esc_handler = EscCodeHandler(self.logs, self.char_disp)
+        self.is_active = active
         self.setup_esc()
+        self.box()
         self.__line = ""
+
+    def resize(self, new_x, new_y):
+        # Clear windows to prevent leftover characters
+        self._real_win.erase()
+        self._real_win.refresh()
+        self._win.erase()
+        self._win.refresh()
+        # Redraw box
+        self._real_win.resize(new_y, new_x)
+        self.box()
+        self._real_win.refresh()
+        # Create new window instance and redraw
+        start_y, start_x = self._real_win.getbegyx()
+        self._win = self._real_win.derwin(new_y-2, new_x-2, 1, 1)
+        self.term.resize(new_x-2-2, new_y-2-2)
+        self.char_disp.resize(new_x-2, new_y-2)
+        self.draw()
         
     def refresh_curs(self):
+        self.logs.info(f"{self.char_disp.curs}, {self.char_disp.size}")
         self._win.move(self.char_disp.curs.y, self.char_disp.curs.x)
 
     def setup_esc(self):
@@ -32,13 +54,31 @@ class TerminalWindow(Boxed):
         self.esc_handler.on("C", self.move_curs_right)
         self.esc_handler.on("D", self.move_curs_left)
         self.esc_handler.on("H", self.move_curs_home)
+        self.esc_handler.on("d", self.move_curs_vertical)
+        self.esc_handler.on("G", self.move_curs_horizontal)
         self.esc_handler.on("J", self.erase_disp)
         self.esc_handler.on("K", self.erase_inline)
         self.esc_handler.on("P", self.del_char)
         self.esc_handler.on("@", self.backspace_char)
 
-    def move_curs_home(self, disp, lines=0, cols=0):
-        disp.curs.set_pos(int(cols), int(lines))
+    def move_curs_horizontal(self, disp, cols):
+        cols = int(cols)
+        if not cols:
+            cols = 1
+        disp.curs.x = cols - 1
+
+    def move_curs_vertical(self, disp, lines):
+        lines = int(lines)
+        if not lines:
+            lines = 1
+        disp.curs.y = lines - 1
+
+    def move_curs_home(self, disp, lines=1, cols=1):
+        if lines == "0":
+            lines = 1
+        if cols == "0":
+            cols = 1
+        disp.curs.set_pos(int(cols)-1, int(lines)-1)
 
     def backspace_char(self, disp, code):
         cols = int(code)
@@ -96,6 +136,11 @@ class TerminalWindow(Boxed):
         self.refresh_curs()
 
     def draw(self):
+        if self.is_active:
+            curses.curs_set(2)
+        else:
+            curses.curs_set(0)
+        self.box()
         self._win.erase()
         for y, row in enumerate(self.char_disp.buffer):
             for x, cell in enumerate(row):
@@ -116,12 +161,9 @@ class TerminalWindow(Boxed):
                 self.char_disp.write(self.__line)            
                 self.__line = ""
                 new_chunk = self.esc_handler.handle_head(chunk)
-                if new_chunk is None:
-                    self.char_disp.write(self.__line)
-                    self.__line = c
-                    return
-                chunk = new_chunk
-                continue
+                if new_chunk is not None:
+                    chunk = new_chunk
+                    continue
             elif c == "\r":
                 self.char_disp.write(self.__line)
                 self.char_disp.curs.x = 0
@@ -138,10 +180,11 @@ class TerminalWindow(Boxed):
         self.__line = ""
 
     def update(self):
+        if self.term.proc.poll() is not None:
+            self.on_destroy(self)
         for buff in [self.term.stdout, self.term.stderr]:
             chunk = self.term.read(buff, 4096)
             if chunk:
                 self.logs.info(repr(chunk))
                 self._parse(chunk)
-            self.draw()
-    
+                self.draw()

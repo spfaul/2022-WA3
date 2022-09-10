@@ -1,4 +1,4 @@
-
+import curses
 
 class Boxed:
     def __init__(self, win):
