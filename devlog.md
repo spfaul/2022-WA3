@@ -41,9 +41,25 @@
 - Next week
     - [ ] ANSI escape code encounter implementation 
 ## Week 8 (16 Aug - 22 Aug)
-
+- Goals
+    - Ended up doing nothing because of too many commitments
 ## Week 9 (23 Aug - 29 Aug)
-
+- Goals
+    - [x] Small bugfixes within escape code handling
+- Problems
+    - Exams and lack of time
 ## Week 10 (30 Aug - 5 Sep)
-
+- Goals
+    - [x] Backspace and arrow key cursor manipulation
+    - [ ] Splitting windows
+- Problems
+    - NA
 ## Sep Holiday (5 Sep - 10 Sep) **Submission date is 10 Sep**
+- Goals
+    - [x] Docstrings, type hints and comments
+    - [x] Implement splitting and cycling of windows
+    - [x] Command line UI
+    - [x] Cleanup code
+- Problems
+    - User keystrokes are detected unreliably
+        - Migrated from curses getch() to a homemade getch() reading from stdin
