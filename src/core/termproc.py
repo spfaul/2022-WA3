@@ -9,8 +9,11 @@ import sys
 
 class TerminalProcess:
     def __init__(self):
+        """
+        Underlying pty process implementation
+        """
         master, slave = pty.openpty() # Open a psuedoterminal pair with  master controlling slave's io
-        self.proc = subprocess.Popen(args=[os.environ.get('SHELL', '/bin/sh')],
+        self.proc = subprocess.Popen(args=[os.environ.get('SHELL', '/bin/bash')],
                                     env=os.environ,
                                     stdin=slave,
                                     stdout=slave,
@@ -76,19 +79,24 @@ class TerminalProcess:
         else:
             os.close(fd)
 
-    def read(self, fd, amnt_bytes):
+    def read(self, fd, amnt_bytes: int):
+        """ Read a specified amount of bytes from process (NON-BLOCKING) """
         try:
-            chunk = fd.read(amnt_bytes)
+            chunk: bytes = fd.read(amnt_bytes)
             if chunk is None:
                 return None
             return chunk.decode('utf8', 'replace')
         except OSError: # Nothing to read
             return ''
 
-    def send(self, line):
+    def send(self, line: str):
+        """ Write to process stdin """
         self.stdin.write(line)
 
-    def resize(self, cols, lines):
+    def resize(self, cols: int, lines: int):
+        """
+        Resize by sending SIGWINCH to process
+        """
         fcntl.ioctl(self.stdout, termios.TIOCSWINSZ, struct.pack("hhhh", lines, cols, 0, 0))
         self.proc.send_signal(signal.SIGWINCH)
         
