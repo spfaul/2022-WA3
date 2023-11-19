@@ -10,6 +10,8 @@
 **System requirements: UNIX (preferably Linux), Python 3.8+**
 **This project has not been tested on OSX and will likely produce unexpected behavior**
 
+[Demo](https://drive.google.com/file/d/1lvg2EarP1OJh05xtUpKk-6qaKnc_CHtg/view?usp=sharing)
+
 [Project Proposal](proposal.md)
 
 [Development Log](devlog.md)
